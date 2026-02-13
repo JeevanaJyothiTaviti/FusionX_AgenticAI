@@ -7,13 +7,14 @@ sys.path.append(str(BASE_DIR))
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import openai as OpenAI
 
 from agents.orchestrator import (
     build_agent_table_for_week,
     generate_portfolio_summary,
     generate_customer_summary
 )
+
+from openai import OpenAI
 
 api_key = None
 
