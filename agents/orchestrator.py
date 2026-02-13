@@ -111,12 +111,6 @@ def make_json_safe(obj):
         return obj.isoformat()
     return obj
 
-import json
-from openai import OpenAI
-
-client = OpenAI()  # assumes API key is set via secrets/env
-
-
 # ==========================================================
 # ------------------ AI PORTFOLIO SUMMARY ------------------
 # ==========================================================
