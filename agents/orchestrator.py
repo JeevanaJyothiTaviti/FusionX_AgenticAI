@@ -109,6 +109,11 @@ def make_json_safe(obj):
         return obj.isoformat()
     return obj
 
+import json
+from openai import OpenAI
+
+client = OpenAI()  # assumes API key is set via secrets/env
+
 
 # ==========================================================
 # ------------------ AI PORTFOLIO SUMMARY ------------------
@@ -116,33 +121,58 @@ def make_json_safe(obj):
 
 def generate_portfolio_summary(kpi_row, risk_df):
 
+    # --- Reduce columns to only important ones ---
+    important_cols = [
+        col for col in [
+            "account_name",
+            "churn_risk_score",
+            "expansion_score",
+            "usage_trend",
+            "csat",
+            "revenue"
+        ] if col in risk_df.columns
+    ]
+
+    top_risk_accounts = (
+        risk_df
+        .sort_values("churn_risk_score", ascending=False)
+        [important_cols]
+        .head(5)
+    )
+
     context = {
         "portfolio_kpis": make_json_safe(kpi_row.to_dict()),
-        "top_risk_accounts": make_json_safe(
-            risk_df.head(10).to_dict(orient="records")
+        "top_5_risk_accounts": make_json_safe(
+            top_risk_accounts.to_dict(orient="records")
         )
     }
 
     prompt = f"""
-    You are a VP-level AI Strategy Copilot.
+You are a VP-level AI Strategy Copilot.
 
-    Portfolio Snapshot:
-    {json.dumps(context, indent=2)}
+Below is a summarized portfolio snapshot.
 
-    Provide:
-    1. Portfolio health summary
-    2. Major churn risks
-    3. Expansion opportunities
-    4. Immediate strategic priorities
-    """
+Portfolio Data:
+{json.dumps(context, indent=2)}
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
-    )
+Provide:
+1. Portfolio health summary (executive level)
+2. Key churn drivers
+3. Expansion opportunities
+4. Immediate strategic priorities (bullet format)
+"""
 
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt[:12000]}],
+            temperature=0.3
+        )
+
+        return response.choices[0].message.content
+
+    except Exception as e:
+        return f"AI Summary Error: {str(e)}"
 
 
 # ==========================================================
@@ -151,25 +181,34 @@ def generate_portfolio_summary(kpi_row, risk_df):
 
 def generate_customer_summary(customer_row):
 
-    context = make_json_safe(customer_row.to_dict())
+    # Reduce noise: keep only non-null & relevant fields
+    customer_dict = {
+        k: v for k, v in make_json_safe(customer_row.to_dict()).items()
+        if v is not None
+    }
 
     prompt = f"""
-    You are a Senior Customer Success AI Copilot.
+You are a Senior Customer Success AI Copilot.
 
-    Customer Snapshot:
-    {json.dumps(context, indent=2)}
+Customer Snapshot:
+{json.dumps(customer_dict, indent=2)}
 
-    Provide:
-    1. Executive summary
-    2. Key risks
-    3. Expansion potential
-    4. Recommended next action
-    """
+Provide:
+1. Executive summary
+2. Key risks (if any)
+3. Expansion potential
+4. Recommended next action (clear & actionable)
+"""
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
-    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt[:12000]}],
+            temperature=0.3
+        )
 
-    return response.choices[0].message.content
+        return response.choices[0].message.content
+
+    except Exception as e:
+        return f"AI Summary Error: {str(e)}"
+
