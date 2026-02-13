@@ -4,7 +4,12 @@ import json
 import os
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+import streamlit as st
+
+client = OpenAI(
+    api_key=st.secrets["OPENAI_API_KEY"]
+)
+
 
 # ==========================================================
 # ----------------- DETERMINISTIC ENGINE -------------------
