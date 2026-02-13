@@ -16,7 +16,7 @@ from agents.orchestrator import (
 
 st.set_page_config(layout="wide")
 st.title("🚀 FusionX Agentic AI Command Center")
-
+st.write("SECRETS KEY:", st.secrets.get("OPENAI_API_KEY"))
 # ==========================================================
 # LOAD DATA
 # ==========================================================
