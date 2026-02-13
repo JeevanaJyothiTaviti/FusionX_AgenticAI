@@ -142,7 +142,6 @@ def generate_portfolio_summary(kpi_row, risk_df):
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3
     )
-    print(client.api_key)
 
     return response.choices[0].message.content
 
