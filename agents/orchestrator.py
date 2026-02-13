@@ -4,18 +4,11 @@ import json
 import os
 from openai import OpenAI
 import streamlit as st
-from dotenv import load_dotenv
 
-# Load local .env (only affects local dev)
-load_dotenv(override=True)
-
-# Priority: Streamlit secrets > .env
 api_key = None
 
 if "OPENAI_API_KEY" in st.secrets:
     api_key = st.secrets["OPENAI_API_KEY"]
-else:
-    api_key = os.getenv("OPENAI_API_KEY")
 
 client = OpenAI(api_key=api_key)
 
