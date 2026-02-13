@@ -14,6 +14,13 @@ from agents.orchestrator import (
     generate_customer_summary
 )
 
+api_key = None
+
+if "OPENAI_API_KEY" in st.secrets:
+    api_key = st.secrets["OPENAI_API_KEY"]
+
+client = OpenAI(api_key=api_key)
+
 st.set_page_config(layout="wide")
 st.title("🚀 FusionX Agentic AI Command Center")
 
