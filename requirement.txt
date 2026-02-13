@@ -1,0 +1,14 @@
+pandas
+pyarrow
+openpyxl
+numpy
+scikit-learn
+streamlit   # optional for dashboard
+langchain   # optional for Agentic AI orchestration
+openai      # optional for LLM summarization
+joblib      # loading models
+scipy
+matplotlib
+seaborn
+plotly
+python-dotenv
